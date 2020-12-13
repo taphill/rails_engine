@@ -71,7 +71,7 @@ RSpec.describe 'Api/V1/Items request', type: :request do
     before { get api_v1_item_path(4) }
 
     it { expect(response.status).to eq(404) }
-    it { expect(json_body).to have_key(:error) }
-    it { expect(json_body[:error]).to eq("Couldn't find Item with 'id'=4") }
+    it { expect(json_body).to have_key(:message) }
+    it { expect(json_body[:message]).to eq('Not Found') }
   end
 end
