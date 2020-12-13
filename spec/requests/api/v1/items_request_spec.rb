@@ -36,7 +36,7 @@ RSpec.describe 'Api/V1/Items request', type: :request do
     end
   end
 
-  describe 'GET /items/:id' do
+  describe 'valid GET /items/:id request' do
     let(:item) { create(:item) }
     let(:json_body) { JSON.parse(response.body, symbolize_names: true) }
 
@@ -63,5 +63,15 @@ RSpec.describe 'Api/V1/Items request', type: :request do
       expect(json_body[:data][:attributes]).to have_key(:merchant_id)
       expect(json_body[:data][:attributes][:merchant_id]).to be_a(Integer)
     end
+  end
+
+  describe 'invalid GET /items/:id request' do
+    let(:json_body) { JSON.parse(response.body, symbolize_names: true) }
+
+    before { get api_v1_item_path(4) }
+
+    it { expect(response.status).to eq(404) }
+    it { expect(json_body).to have_key(:error) }
+    it { expect(json_body[:error]).to eq("Couldn't find Item with 'id'=4") }
   end
 end
