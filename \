@@ -1,0 +1,7 @@
+require 'rails_helper'
+
+RSpec.describe "Api/V1/Items request", type: :request do
+  it 'sends a list of items' do
+
+  end
+end
