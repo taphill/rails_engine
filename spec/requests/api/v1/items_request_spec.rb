@@ -102,7 +102,6 @@ RSpec.describe 'Api/V1/Items request', type: :request do
     let(:merchant) { create(:merchant) }
     let :item_params do
       {
-        name: '',
         description: 'Likely the best item ever.',
         unit_price: 1200.99,
         merchant_id: merchant.id
@@ -117,5 +116,65 @@ RSpec.describe 'Api/V1/Items request', type: :request do
     it { expect(response.status).to eq(403) }
     it { expect(json_body).to have_key(:message) }
     it { expect(json_body[:message]).to eq("Validation failed: Name can't be blank") }
+  end
+
+  describe 'no description in POST /items request returns 403' do
+    let(:merchant) { create(:merchant) }
+    let :item_params do
+      {
+        name: 'Great Item',
+        unit_price: 1200.99,
+        merchant_id: merchant.id
+      }
+    end
+
+    let(:headers) { { 'CONTENT_TYPE' => 'application/json' } } 
+    let(:json_body) { JSON.parse(response.body, symbolize_names: true) }
+
+    before { post api_v1_items_path, headers: headers, params: JSON.generate(item: item_params) }
+
+    it { expect(response.status).to eq(403) }
+    it { expect(json_body).to have_key(:message) }
+    it { expect(json_body[:message]).to eq("Validation failed: Description can't be blank") }
+  end
+
+  describe 'no unit_price in POST /items request returns 403' do
+    let(:merchant) { create(:merchant) }
+    let :item_params do
+      {
+        name: 'Great Item',
+        description: 'Likely the best item ever.',
+        merchant_id: merchant.id
+      }
+    end
+
+    let(:headers) { { 'CONTENT_TYPE' => 'application/json' } } 
+    let(:json_body) { JSON.parse(response.body, symbolize_names: true) }
+
+    before { post api_v1_items_path, headers: headers, params: JSON.generate(item: item_params) }
+
+    it { expect(response.status).to eq(403) }
+    it { expect(json_body).to have_key(:message) }
+    it { expect(json_body[:message]).to eq("Validation failed: Unit price can't be blank") }
+  end
+
+  describe 'non-existant merchant in POST /items request returns 404' do
+    let :item_params do
+      {
+        name: 'Great Item',
+        description: 'Likely the best item ever.',
+        unit_price: 1200.99,
+        merchant_id: 8
+      }
+    end
+
+    let(:headers) { { 'CONTENT_TYPE' => 'application/json' } } 
+    let(:json_body) { JSON.parse(response.body, symbolize_names: true) }
+
+    before { post api_v1_items_path, headers: headers, params: JSON.generate(item: item_params) }
+
+    it { expect(response.status).to eq(404) }
+    it { expect(json_body).to have_key(:message) }
+    it { expect(json_body[:message]).to eq("Validation failed: Merchant must exist") }
   end
 end
