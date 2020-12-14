@@ -68,11 +68,13 @@ RSpec.describe 'Api/V1/Items request', type: :request do
   describe 'invalid GET /items/:id request' do
     let(:json_body) { JSON.parse(response.body, symbolize_names: true) }
 
-    before { get api_v1_item_path(4) }
+    it 'returns a 404' do
+      get api_v1_item_path(4)
 
-    it { expect(response.status).to eq(404) }
-    it { expect(json_body).to have_key(:message) }
-    it { expect(json_body[:message]).to eq('Not Found') }
+      expect(response.status).to eq(404)
+      expect(json_body).to have_key(:message)
+      expect(json_body[:message]).to eq('Not Found')
+    end
   end
 
   describe 'valid POST /items request' do
@@ -86,9 +88,9 @@ RSpec.describe 'Api/V1/Items request', type: :request do
       }
     end
 
-    let(:headers) { { 'CONTENT_TYPE' => 'application/json' } } 
+    let(:headers) { { 'CONTENT_TYPE' => 'application/json' } }
 
-    before { post api_v1_items_path, headers: headers, params: JSON.generate(item: item_params) }
+    before { post api_v1_items_path, headers: headers, params: JSON.generate(item_params) }
 
     it { expect(response.status).to eq(200) }
 
@@ -98,7 +100,7 @@ RSpec.describe 'Api/V1/Items request', type: :request do
     it { expect(Item.last.merchant_id).to eq(item_params[:merchant_id]) }
   end
 
-  describe 'no name in POST /items request returns 403' do
+  describe 'no name in POST /items request' do
     let(:merchant) { create(:merchant) }
     let :item_params do
       {
@@ -108,17 +110,19 @@ RSpec.describe 'Api/V1/Items request', type: :request do
       }
     end
 
-    let(:headers) { { 'CONTENT_TYPE' => 'application/json' } } 
+    let(:headers) { { 'CONTENT_TYPE' => 'application/json' } }
     let(:json_body) { JSON.parse(response.body, symbolize_names: true) }
 
-    before { post api_v1_items_path, headers: headers, params: JSON.generate(item: item_params) }
+    it 'returns a 403' do
+      post api_v1_items_path, headers: headers, params: JSON.generate(item_params)
 
-    it { expect(response.status).to eq(403) }
-    it { expect(json_body).to have_key(:message) }
-    it { expect(json_body[:message]).to eq("Validation failed: Name can't be blank") }
+      expect(response.status).to eq(403)
+      expect(json_body).to have_key(:message)
+      expect(json_body[:message]).to eq("Validation failed: Name can't be blank")
+    end
   end
 
-  describe 'no description in POST /items request returns 403' do
+  describe 'no description in POST /items request' do
     let(:merchant) { create(:merchant) }
     let :item_params do
       {
@@ -128,17 +132,19 @@ RSpec.describe 'Api/V1/Items request', type: :request do
       }
     end
 
-    let(:headers) { { 'CONTENT_TYPE' => 'application/json' } } 
+    let(:headers) { { 'CONTENT_TYPE' => 'application/json' } }
     let(:json_body) { JSON.parse(response.body, symbolize_names: true) }
 
-    before { post api_v1_items_path, headers: headers, params: JSON.generate(item: item_params) }
+    it 'returns a 403' do
+      post api_v1_items_path, headers: headers, params: JSON.generate(item_params)
 
-    it { expect(response.status).to eq(403) }
-    it { expect(json_body).to have_key(:message) }
-    it { expect(json_body[:message]).to eq("Validation failed: Description can't be blank") }
+      expect(response.status).to eq(403)
+      expect(json_body).to have_key(:message)
+      expect(json_body[:message]).to eq("Validation failed: Description can't be blank")
+    end
   end
 
-  describe 'no unit_price in POST /items request returns 403' do
+  describe 'no unit_price in POST /items request' do
     let(:merchant) { create(:merchant) }
     let :item_params do
       {
@@ -148,17 +154,19 @@ RSpec.describe 'Api/V1/Items request', type: :request do
       }
     end
 
-    let(:headers) { { 'CONTENT_TYPE' => 'application/json' } } 
+    let(:headers) { { 'CONTENT_TYPE' => 'application/json' } }
     let(:json_body) { JSON.parse(response.body, symbolize_names: true) }
 
-    before { post api_v1_items_path, headers: headers, params: JSON.generate(item: item_params) }
+    it 'returns a 403' do
+      post api_v1_items_path, headers: headers, params: JSON.generate(item_params)
 
-    it { expect(response.status).to eq(403) }
-    it { expect(json_body).to have_key(:message) }
-    it { expect(json_body[:message]).to eq("Validation failed: Unit price can't be blank") }
+      expect(response.status).to eq(403)
+      expect(json_body).to have_key(:message)
+      expect(json_body[:message]).to eq("Validation failed: Unit price can't be blank")
+    end
   end
 
-  describe 'non-existant merchant in POST /items request returns 404' do
+  describe 'non-existant merchant in POST /items request' do
     let :item_params do
       {
         name: 'Great Item',
@@ -168,13 +176,38 @@ RSpec.describe 'Api/V1/Items request', type: :request do
       }
     end
 
-    let(:headers) { { 'CONTENT_TYPE' => 'application/json' } } 
+    let(:headers) { { 'CONTENT_TYPE' => 'application/json' } }
     let(:json_body) { JSON.parse(response.body, symbolize_names: true) }
 
-    before { post api_v1_items_path, headers: headers, params: JSON.generate(item: item_params) }
+    it 'returns a 404' do
+      post api_v1_items_path, headers: headers, params: JSON.generate(item_params)
 
-    it { expect(response.status).to eq(404) }
-    it { expect(json_body).to have_key(:message) }
-    it { expect(json_body[:message]).to eq("Validation failed: Merchant must exist") }
+      expect(response.status).to eq(404)
+      expect(json_body).to have_key(:message)
+      expect(json_body[:message]).to eq('Validation failed: Merchant must exist')
+    end
+  end
+
+  describe 'valid DELETE /items/:id request' do
+    let!(:item) { create(:item) }
+
+    it { expect(Item.count).to eq(1) }
+    it { expect { delete api_v1_item_path(item.id) }.to change(Item, :count).by(-1) }
+
+    it 'deletes the item' do
+      delete api_v1_item_path(item.id)
+      expect(response.status).to eq(204)
+      expect(Item.count).to eq(0)
+    end
+  end
+
+  describe 'invalid DELETE /items/:id request' do
+    let(:json_body) { JSON.parse(response.body, symbolize_names: true) }
+
+    it 'returns a 404' do
+      delete api_v1_item_path(4)
+      expect(response.status).to eq(404)
+      expect(json_body[:message]).to eq('Not Found')
+    end
   end
 end
