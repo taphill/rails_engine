@@ -210,4 +210,32 @@ RSpec.describe 'Api/V1/Items request', type: :request do
       expect(json_body[:message]).to eq('Not Found')
     end
   end
+
+  describe 'valid PATCH /items/:id request' do
+    before do
+      @id = create(:item).id
+      @previous_name = Item.last.name
+      @item_params = { name: 'New Best Item' }
+      @headers = { 'CONTENT_TYPE' => 'application/json' }
+    end
+
+    it 'updates an item' do
+      patch api_v1_item_path(@id), headers: @headers, params: JSON.generate(@item_params)
+
+      item = Item.find(@id)
+      expect(response.status).to eq(200)
+      expect(item.name).not_to eq(@previous_name)
+      expect(item.name).to eq('New Best Item')
+    end
+  end
+
+  describe 'invalid PATCH /items/:id request' do
+    let(:json_body) { JSON.parse(response.body, symbolize_names: true) }
+
+    it 'returns a 404' do
+      patch api_v1_item_path(4)
+      expect(response.status).to eq(404)
+      expect(json_body[:message]).to eq('Not Found')
+    end
+  end
 end
