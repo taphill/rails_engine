@@ -11,6 +11,10 @@ class ApplicationController < ActionController::API
   end
 
   def record_invalid(error)
-    render json: { message: error.message }, status: 403
+    if error.message.include?('must exist')
+      render json: { message: error.message }, status: 404
+    else
+      render json: { message: error.message }, status: 403
+    end
   end
 end
