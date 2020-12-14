@@ -15,10 +15,14 @@ module Api
         render json: ItemSerializer.new(Item.create!(item_params))
       end
 
+      def destroy
+        Item.delete(params[:id]) if Item.find(params[:id])
+      end
+
       private
 
       def item_params
-        params.require(:item).permit(:name, :description, :unit_price, :merchant_id)
+        params.permit(:name, :description, :unit_price, :merchant_id)
       end
     end
   end
