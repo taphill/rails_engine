@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe 'Api/V1/Items request', type: :request do
-  describe 'GET /items' do
+  describe 'GET /items request' do
     before do
       create_list(:item, 3)
       get api_v1_items_path
@@ -73,5 +73,49 @@ RSpec.describe 'Api/V1/Items request', type: :request do
     it { expect(response.status).to eq(404) }
     it { expect(json_body).to have_key(:message) }
     it { expect(json_body[:message]).to eq('Not Found') }
+  end
+
+  describe 'valid POST /items request' do
+    let(:merchant) { create(:merchant) }
+    let :item_params do
+      {
+        name: 'Great Item',
+        description: 'Likely the best item ever.',
+        unit_price: 1200.99,
+        merchant_id: merchant.id
+      }
+    end
+
+    let(:headers) { { 'CONTENT_TYPE' => 'application/json' } } 
+
+    before { post api_v1_items_path, headers: headers, params: JSON.generate(item: item_params) }
+
+    it { expect(response.status).to eq(200) }
+
+    it { expect(Item.last.name).to eq(item_params[:name]) }
+    it { expect(Item.last.description).to eq(item_params[:description]) }
+    it { expect(Item.last.unit_price).to eq(item_params[:unit_price]) }
+    it { expect(Item.last.merchant_id).to eq(item_params[:merchant_id]) }
+  end
+
+  describe 'no name in POST /items request returns 403' do
+    let(:merchant) { create(:merchant) }
+    let :item_params do
+      {
+        name: '',
+        description: 'Likely the best item ever.',
+        unit_price: 1200.99,
+        merchant_id: merchant.id
+      }
+    end
+
+    let(:headers) { { 'CONTENT_TYPE' => 'application/json' } } 
+    let(:json_body) { JSON.parse(response.body, symbolize_names: true) }
+
+    before { post api_v1_items_path, headers: headers, params: JSON.generate(item: item_params) }
+
+    it { expect(response.status).to eq(403) }
+    it { expect(json_body).to have_key(:message) }
+    it { expect(json_body[:message]).to eq("Validation failed: Name can't be blank") }
   end
 end
