@@ -238,4 +238,80 @@ RSpec.describe 'Api/V1/Items request', type: :request do
       expect(json_body[:message]).to eq('Not Found')
     end
   end
+
+  describe 'no name in PATCH /items/:id request' do
+    let(:json_body) { JSON.parse(response.body, symbolize_names: true) }
+
+    before do
+      @id = create(:item).id
+      @previous_name = Item.last.name
+      @item_params = { name: '' }
+      @headers = { 'CONTENT_TYPE' => 'application/json' }
+    end
+
+    it 'returns a 403' do
+      patch api_v1_item_path(@id), headers: @headers, params: JSON.generate(@item_params)
+
+      expect(response.status).to eq(403)
+      expect(json_body).to have_key(:message)
+      expect(json_body[:message]).to eq("Validation failed: Name can't be blank")
+    end
+  end
+
+  describe 'no description in PATCH /items/:id request' do
+    let(:json_body) { JSON.parse(response.body, symbolize_names: true) }
+
+    before do
+      @id = create(:item).id
+      @previous_name = Item.last.name
+      @item_params = { description: '' }
+      @headers = { 'CONTENT_TYPE' => 'application/json' }
+    end
+
+    it 'returns a 403' do
+      patch api_v1_item_path(@id), headers: @headers, params: JSON.generate(@item_params)
+
+      expect(response.status).to eq(403)
+      expect(json_body).to have_key(:message)
+      expect(json_body[:message]).to eq("Validation failed: Description can't be blank")
+    end
+  end
+
+  describe 'no unit_price in PATCH /items/:id request' do
+    let(:json_body) { JSON.parse(response.body, symbolize_names: true) }
+
+    before do
+      @id = create(:item).id
+      @previous_name = Item.last.name
+      @item_params = { unit_price: '' }
+      @headers = { 'CONTENT_TYPE' => 'application/json' }
+    end
+
+    it 'returns a 403' do
+      patch api_v1_item_path(@id), headers: @headers, params: JSON.generate(@item_params)
+
+      expect(response.status).to eq(403)
+      expect(json_body).to have_key(:message)
+      expect(json_body[:message]).to eq("Validation failed: Unit price can't be blank")
+    end
+  end
+
+  describe 'non-existant merchant in PATCH /items/:id request' do
+    let(:json_body) { JSON.parse(response.body, symbolize_names: true) }
+
+    before do
+      @id = create(:item).id
+      @previous_name = Item.last.name
+      @item_params = { merchant_id: 800 }
+      @headers = { 'CONTENT_TYPE' => 'application/json' }
+    end
+
+    it 'returns a 404' do
+      patch api_v1_item_path(@id), headers: @headers, params: JSON.generate(@item_params)
+
+      expect(response.status).to eq(404)
+      expect(json_body).to have_key(:message)
+      expect(json_body[:message]).to eq('Validation failed: Merchant must exist')
+    end
+  end
 end
