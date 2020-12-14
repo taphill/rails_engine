@@ -16,6 +16,9 @@ module Api
       end
 
       def update
+        item = Item.find(params[:id])
+        raise ActiveRecord::RecordInvalid, item unless item.update(item_params)
+
         render json: ItemSerializer.new(Item.update(params[:id], item_params))
       end
 
