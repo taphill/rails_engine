@@ -15,6 +15,13 @@ module Api
         render json: MerchantSerializer.new(Merchant.create!(merchant_params))
       end
 
+      def update
+        merchant = Merchant.find(params[:id])
+        raise ActiveRecord::RecordInvalid, merchant unless merchant.update(merchant_params)
+
+        render json: MerchantSerializer.new(Merchant.update(params[:id], merchant_params))
+      end
+
       def destroy
         Merchant.delete(params[:id]) if Merchant.find(params[:id])
       end
