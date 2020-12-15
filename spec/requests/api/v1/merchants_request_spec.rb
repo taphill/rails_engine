@@ -129,7 +129,7 @@ RSpec.describe 'Api/V1/Merchants request', type: :request do
 
   describe 'invalid PATCH /merchants/:id request' do
     let(:json_body) { JSON.parse(response.body, symbolize_names: true) }
-    
+
     before do
       @merchant_params = { name: 'New Best Merchant' }
       @headers = { 'CONTENT_TYPE' => 'application/json' }
@@ -159,6 +159,57 @@ RSpec.describe 'Api/V1/Merchants request', type: :request do
       expect(response.status).to eq(403)
       expect(json_body).to have_key(:message)
       expect(json_body[:message]).to eq("Validation failed: Name can't be blank")
+    end
+  end
+
+  describe 'valid GET /merchants/:id/items request' do
+    let(:merchant) { create(:merchant, :with_items, item_count: 3) }
+    let(:json_body) { JSON.parse(response.body, symbolize_names: true) }
+
+    before { get api_v1_merchant_items_path(merchant.id) }
+
+    it { expect(response.status).to eq(200) }
+
+    it { expect(json_body).to be_a(Hash) }
+    it { expect(json_body).to have_key(:data) }
+    it { expect(json_body[:data]).to be_a(Array) }
+    it { expect(json_body[:data].count).to eq(3) }
+    it { expect(json_body[:data][0][:attributes]).to be_a(Hash) }
+
+    it 'has item id' do
+      json_body[:data].each do |item|
+        expect(item).to have_key(:id)
+        expect(item[:id]).to be_a(String)
+        expect(item[:id].to_i).to be_a(Integer)
+      end
+    end
+
+    it 'has item attributes' do
+      json_body[:data].each do |item|
+        expect(item[:attributes]).to have_key(:name)
+        expect(item[:attributes][:name]).to be_a(String)
+
+        expect(item[:attributes]).to have_key(:description)
+        expect(item[:attributes][:description]).to be_a(String)
+
+        expect(item[:attributes]).to have_key(:unit_price)
+        expect(item[:attributes][:unit_price]).to be_a(Float)
+
+        expect(item[:attributes]).to have_key(:merchant_id)
+        expect(item[:attributes][:merchant_id]).to be_a(Integer)
+      end
+    end
+  end
+
+  describe 'invalid GET /merchants/:id/items request' do
+    let(:json_body) { JSON.parse(response.body, symbolize_names: true) }
+
+    it 'returns a 404' do
+      get api_v1_merchant_items_path(4)
+
+      expect(response.status).to eq(404)
+      expect(json_body).to have_key(:message)
+      expect(json_body[:message]).to eq('Not Found')
     end
   end
 end
