@@ -19,10 +19,10 @@ RSpec.describe 'Api/V1/Merchants request', type: :request do
     it { expect(json_body[:data].count).to eq(3) }
     it { expect(json_body[:data][0][:attributes]).to be_a(Hash) }
 
-    it 'has item attributes' do
-      json_body[:data].each do |item|
-        expect(item[:attributes]).to have_key(:name)
-        expect(item[:attributes][:name]).to be_a(String)
+    it 'has merchant attributes' do
+      json_body[:data].each do |merchant|
+        expect(merchant[:attributes]).to have_key(:name)
+        expect(merchant[:attributes][:name]).to be_a(String)
       end
     end
   end
@@ -41,7 +41,7 @@ RSpec.describe 'Api/V1/Merchants request', type: :request do
     it { expect(json_body[:data]).to have_key(:attributes) }
     it { expect(json_body[:data][:attributes]).to be_a(Hash) }
 
-    it 'has item attributes' do
+    it 'has merchant attributes' do
       expect(json_body[:data][:attributes]).to have_key(:name)
       expect(json_body[:data][:attributes][:name]).to be_a(String)
     end
@@ -92,7 +92,7 @@ RSpec.describe 'Api/V1/Merchants request', type: :request do
     it { expect(Merchant.count).to eq(1) }
     it { expect { delete api_v1_merchant_path(merchant.id) }.to change(Merchant, :count).by(-1) }
 
-    it 'deletes the item' do
+    it 'deletes the merchant' do
       delete api_v1_merchant_path(merchant.id)
       expect(response.status).to eq(204)
       expect(Item.count).to eq(0)
@@ -106,6 +106,59 @@ RSpec.describe 'Api/V1/Merchants request', type: :request do
       delete api_v1_merchant_path(4)
       expect(response.status).to eq(404)
       expect(json_body[:message]).to eq('Not Found')
+    end
+  end
+
+  describe 'valid PATCH /merchants/:id request' do
+    before do
+      @id = create(:merchant).id
+      @previous_name = Merchant.last.name
+      @merchant_params = { name: 'New Best Merchant' }
+      @headers = { 'CONTENT_TYPE' => 'application/json' }
+    end
+
+    it 'updates a merchant' do
+      patch api_v1_merchant_path(@id), headers: @headers, params: JSON.generate(@merchant_params)
+
+      merchant = Merchant.find(@id)
+      expect(response.status).to eq(200)
+      expect(merchant.name).not_to eq(@previous_name)
+      expect(merchant.name).to eq('New Best Merchant')
+    end
+  end
+
+  describe 'invalid PATCH /merchants/:id request' do
+    let(:json_body) { JSON.parse(response.body, symbolize_names: true) }
+    
+    before do
+      @merchant_params = { name: 'New Best Merchant' }
+      @headers = { 'CONTENT_TYPE' => 'application/json' }
+    end
+
+    it 'returns a 404' do
+      patch api_v1_merchant_path(4), headers: @headers, params: JSON.generate(@merchant_params)
+
+      expect(response.status).to eq(404)
+      expect(json_body[:message]).to eq('Not Found')
+    end
+  end
+
+  describe 'no name in PATCH /merchants/:id request' do
+    let(:json_body) { JSON.parse(response.body, symbolize_names: true) }
+
+    before do
+      @id = create(:merchant).id
+      @previous_name = Merchant.last.name
+      @merchant_params = { name: '' }
+      @headers = { 'CONTENT_TYPE' => 'application/json' }
+    end
+
+    it 'returns a 403' do
+      patch api_v1_merchant_path(@id), headers: @headers, params: JSON.generate(@merchant_params)
+
+      expect(response.status).to eq(403)
+      expect(json_body).to have_key(:message)
+      expect(json_body[:message]).to eq("Validation failed: Name can't be blank")
     end
   end
 end
