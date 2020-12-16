@@ -25,7 +25,7 @@ RSpec.describe Merchant, type: :model do
     end
 
     describe '.find_all_by_created_at()' do
-      it 'returns an array ofr merchants with the created_at date' do
+      it 'returns an array of merchants with the created_at date' do
         create(:merchant, created_at: '2012-01-19 14:53:59')
         merchant1 = create(:merchant, created_at: '2012-03-27 14:53:59')
         merchant2 = create(:merchant, created_at: '2012-03-27 14:53:59')
@@ -37,7 +37,7 @@ RSpec.describe Merchant, type: :model do
     end
 
     describe '.find_all_by_updated_at()' do
-      it 'returns an array ofr merchants with the created_at date' do
+      it 'returns an array of merchants with the created_at date' do
         create(:merchant, updated_at: '2012-01-19 14:53:59')
         merchant1 = create(:merchant, updated_at: '2012-03-27 14:53:59')
         merchant2 = create(:merchant, updated_at: '2012-03-27 14:53:59')
@@ -47,5 +47,41 @@ RSpec.describe Merchant, type: :model do
         expect(described_class.find_all_by_updated_at(updated_at)).to eq([merchant1, merchant2])
       end
     end
+
+    # rubocop:disable Rails/DynamicFindBy
+    describe '.find_by_name()' do
+      it 'returns an array of merchants that contain a fragement, case insensitive' do
+        merchant1 = create(:merchant, name: 'Tillman Group')
+        create(:merchant, name: 'Ike Illard')
+        create(:merchant, name: 'Brown, Parker, & Co')
+
+        expect(described_class.find_by_name('ILL')).to eq(merchant1)
+      end
+    end
+
+    describe '.find_by_created_at()' do
+      it 'returns an array of merchants with the created_at date' do
+        merchant1 = create(:merchant, created_at: '2012-03-27 14:53:59')
+        create(:merchant, created_at: '2012-01-19 14:53:59')
+        create(:merchant, created_at: '2012-03-27 14:53:59')
+
+        created_at = '2012-03-27 14:53:59'
+
+        expect(described_class.find_by_created_at(created_at)).to eq(merchant1)
+      end
+    end
+
+    describe '.find_by_updated_at()' do
+      it 'returns an array of merchants with the created_at date' do
+        merchant1 = create(:merchant, updated_at: '2012-03-27 14:53:59')
+        create(:merchant, updated_at: '2012-01-19 14:53:59')
+        create(:merchant, updated_at: '2012-03-27 14:53:59')
+
+        updated_at = '2012-03-27 14:53:59'
+
+        expect(described_class.find_by_updated_at(updated_at)).to eq(merchant1)
+      end
+    end
+    # rubocop:enable Rails/DynamicFindBy
   end
 end
