@@ -212,4 +212,29 @@ RSpec.describe 'Api/V1/Merchants request', type: :request do
       expect(json_body[:message]).to eq('Not Found')
     end
   end
+
+  describe 'valid GET /merchants/find_all?name= request' do
+    let(:json_body) { JSON.parse(response.body, symbolize_names: true) }
+
+    before do 
+      create(:merchant, name: 'Tillman Group')
+      create(:merchant, name: 'Ike Illard')
+      create(:merchant, name: 'Brown, Parker, & Co')
+      get '/api/v1/merchants/find_all?name=ILL'
+    end
+
+    it { expect(response.status).to eq(200) }
+
+    it 'returns json data' do
+      expect(json_body).to be_a(Hash)
+      expect(json_body).to have_key(:data)
+      expect(json_body[:data]).to be_a(Array)
+      expect(json_body[:data].count).to eq(2)
+    end
+
+    it 'can find a list of merchants that contain a fragment, case insensitive' do
+      expect(json_body[:data][0][:attributes][:name]).to eq('Tillman Group')
+      expect(json_body[:data][1][:attributes][:name]).to eq('Ike Illard')
+    end
+  end
 end
