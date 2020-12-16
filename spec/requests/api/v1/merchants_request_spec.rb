@@ -216,7 +216,7 @@ RSpec.describe 'Api/V1/Merchants request', type: :request do
   describe 'valid GET /merchants/find_all?name= request' do
     let(:json_body) { JSON.parse(response.body, symbolize_names: true) }
 
-    before do 
+    before do
       create(:merchant, name: 'Tillman Group')
       create(:merchant, name: 'Ike Illard')
       create(:merchant, name: 'Brown, Parker, & Co')
@@ -237,4 +237,72 @@ RSpec.describe 'Api/V1/Merchants request', type: :request do
       expect(json_body[:data][1][:attributes][:name]).to eq('Ike Illard')
     end
   end
+
+  describe 'valid GET /merchants/find_all?created_at= request' do
+    let(:json_body) { JSON.parse(response.body, symbolize_names: true) }
+
+    before do
+      create(:merchant, name: 'one', created_at: '2012-01-19 14:53:59')
+      create(:merchant, name: 'two', created_at: '2012-03-27 14:53:59')
+      create(:merchant, name: 'three', created_at: '2012-03-27 14:53:59')
+      get '/api/v1/merchants/find_all?created_at=2012-03-27 14:53:59'
+    end
+
+    it { expect(response.status).to eq(200) }
+
+    it 'returns json data' do
+      expect(json_body).to be_a(Hash)
+      expect(json_body).to have_key(:data)
+      expect(json_body[:data]).to be_a(Array)
+      expect(json_body[:data].count).to eq(2)
+    end
+
+    it 'can find a list of merchants that contain a fragment, case insensitive' do
+      expect(json_body[:data][0][:attributes][:name]).to eq('two')
+      expect(json_body[:data][1][:attributes][:name]).to eq('three')
+    end
+  end
+
+  describe 'valid GET /merchants/find_all?updated_at= request' do
+    let(:json_body) { JSON.parse(response.body, symbolize_names: true) }
+
+    before do
+      create(:merchant, name: 'one', updated_at: '2012-01-19 14:53:59')
+      create(:merchant, name: 'two', updated_at: '2012-03-27 14:53:59')
+      create(:merchant, name: 'three', updated_at: '2012-03-27 14:53:59')
+      get '/api/v1/merchants/find_all?updated_at=2012-03-27 14:53:59'
+    end
+
+    it { expect(response.status).to eq(200) }
+
+    it 'returns json data' do
+      expect(json_body).to be_a(Hash)
+      expect(json_body).to have_key(:data)
+      expect(json_body[:data]).to be_a(Array)
+      expect(json_body[:data].count).to eq(2)
+    end
+
+    it 'can find a list of merchants that contain a fragment, case insensitive' do
+      expect(json_body[:data][0][:attributes][:name]).to eq('two')
+      expect(json_body[:data][1][:attributes][:name]).to eq('three')
+    end
+  end
+
+  #   describe 'valid GET /merchants/find?name= request' do
+  #     let(:json_body) { JSON.parse(response.body, symbolize_names: true) }
+
+  #     before do
+  #       create(:merchant, name: 'Tillman Group')
+  #       create(:merchant, name: 'Ike Illard')
+  #       create(:merchant, name: 'Brown, Parker, & Co')
+  #       get '/api/v1/merchants/find?name=ILL'
+  #     end
+
+  #     it { expect(response.status).to eq(200) }
+
+  #     it 'returns json data' do
+  #       expect(json_body[:data]).to be_a(Hash)
+  #       expect(json_body[:data][:attributes][:name].downcase).to include('ill')
+  #     end
+  #   end
 end
