@@ -314,4 +314,41 @@ RSpec.describe 'Api/V1/Items request', type: :request do
       expect(json_body[:message]).to eq('Validation failed: Merchant must exist')
     end
   end
+
+  describe 'valid GET /items/:id/merchants request' do
+    let(:item) { create(:item) }
+    let(:json_body) { JSON.parse(response.body, symbolize_names: true) }
+
+    before { get api_v1_item_merchants_path(item.id) }
+
+    it { expect(response.status).to eq(200) }
+
+    it { expect(json_body).to be_a(Hash) }
+    it { expect(json_body).to have_key(:data) }
+    it { expect(json_body[:data]).to be_a(Hash) }
+
+    it 'has merchant id' do
+      expect(json_body[:data]).to have_key(:id)
+      expect(json_body[:data][:id]).to be_a(String)
+      expect(json_body[:data][:id].to_i).to be_a(Integer)
+    end
+
+    it 'has merchant attributes' do
+      expect(json_body[:data]).to have_key(:attributes)
+      expect(json_body[:data][:attributes]).to have_key(:name)
+      expect(json_body[:data][:attributes][:name]).to be_a(String)
+    end
+  end
+
+  describe 'invalid GET /items/:id/merchants request' do
+    let(:json_body) { JSON.parse(response.body, symbolize_names: true) }
+
+    it 'returns a 404' do
+      get api_v1_item_merchants_path(4)
+
+      expect(response.status).to eq(404)
+      expect(json_body).to have_key(:message)
+      expect(json_body[:message]).to eq('Not Found')
+    end
+  end
 end
