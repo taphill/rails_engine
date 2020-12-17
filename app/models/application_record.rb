@@ -11,6 +11,10 @@ class ApplicationRecord < ActiveRecord::Base
     where('lower(description) LIKE ?', "%#{description.downcase}%")
   end
 
+  def self.find_all_by_price(price)
+    where(unit_price: price.to_f)
+  end
+
   def self.find_all_by_created_at(created_at)
     where(created_at: created_at)
   end
@@ -21,6 +25,14 @@ class ApplicationRecord < ActiveRecord::Base
 
   def self.find_by_name(name)
     where('lower(name) LIKE ?', "%#{name.downcase}%").limit(1).first
+  end
+
+  def self.find_by_description(description)
+    where('lower(description) LIKE ?', "%#{description.downcase}%").limit(1).first
+  end
+
+  def self.find_by_price(price)
+    where(unit_price: price.to_f).limit(1).first
   end
 
   def self.find_by_created_at(created_at)
