@@ -371,9 +371,209 @@ RSpec.describe 'Api/V1/Items request', type: :request do
       expect(json_body[:data].count).to eq(2)
     end
 
-    it 'can find a list of merchants that contain a fragment, case insensitive' do
+    it 'can find a list of items that contain a fragment, case insensitive' do
       expect(json_body[:data][0][:attributes][:name]).to eq('Big Thing')
       expect(json_body[:data][1][:attributes][:name]).to eq('Smallthing')
+    end
+  end
+
+  describe 'valid GET /items/find_all?description= request' do
+    let(:json_body) { JSON.parse(response.body, symbolize_names: true) }
+
+    before do
+      create(:item, description: 'Really great item')
+      create(:item, description: 'A real good item')
+      create(:item, description: 'Bad')
+      get '/api/v1/items/find_all?description=rEA'
+    end
+
+    it { expect(response.status).to eq(200) }
+
+    it 'returns json data' do
+      expect(json_body).to be_a(Hash)
+      expect(json_body).to have_key(:data)
+      expect(json_body[:data]).to be_a(Array)
+      expect(json_body[:data].count).to eq(2)
+    end
+
+    it 'can find a list of items that contain a fragment, case insensitive' do
+      expect(json_body[:data][0][:attributes][:description]).to eq('Really great item')
+      expect(json_body[:data][1][:attributes][:description]).to eq('A real good item')
+    end
+  end
+
+  describe 'valid GET /items/find_all?unit_price= request' do
+    let(:json_body) { JSON.parse(response.body, symbolize_names: true) }
+
+    before do
+      create(:item, unit_price: 12.00)
+      create(:item, unit_price: 12.00)
+      create(:item, unit_price: 8.00)
+      get '/api/v1/items/find_all?unit_price=12.00'
+    end
+
+    it { expect(response.status).to eq(200) }
+
+    it 'returns json data' do
+      expect(json_body).to be_a(Hash)
+      expect(json_body).to have_key(:data)
+      expect(json_body[:data]).to be_a(Array)
+      expect(json_body[:data].count).to eq(2)
+    end
+
+    it 'can find a list of items that contain a fragment, case insensitive' do
+      expect(json_body[:data][0][:attributes][:unit_price]).to eq(12.00)
+      expect(json_body[:data][1][:attributes][:unit_price]).to eq(12.00)
+    end
+  end
+
+  describe 'valid GET /items/find_all?created_at= request' do
+    let(:json_body) { JSON.parse(response.body, symbolize_names: true) }
+
+    before do
+      create(:item, name: 'one', created_at: '2012-01-19 14:53:59')
+      create(:item, name: 'two', created_at: '2012-03-27 14:53:59')
+      create(:item, name: 'three', created_at: '2012-03-27 14:53:59')
+      get '/api/v1/items/find_all?created_at=2012-03-27 14:53:59'
+    end
+
+    it { expect(response.status).to eq(200) }
+
+    it 'returns json data' do
+      expect(json_body).to be_a(Hash)
+      expect(json_body).to have_key(:data)
+      expect(json_body[:data]).to be_a(Array)
+      expect(json_body[:data].count).to eq(2)
+    end
+
+    it 'can find a list of items' do
+      expect(json_body[:data][0][:attributes][:name]).to eq('two')
+      expect(json_body[:data][1][:attributes][:name]).to eq('three')
+    end
+  end
+
+  describe 'valid GET /items/find_all?updated_at= request' do
+    let(:json_body) { JSON.parse(response.body, symbolize_names: true) }
+
+    before do
+      create(:item, name: 'one', updated_at: '2012-01-19 14:53:59')
+      create(:item, name: 'two', updated_at: '2012-03-27 14:53:59')
+      create(:item, name: 'three', updated_at: '2012-03-27 14:53:59')
+      get '/api/v1/items/find_all?updated_at=2012-03-27 14:53:59'
+    end
+
+    it { expect(response.status).to eq(200) }
+
+    it 'returns json data' do
+      expect(json_body).to be_a(Hash)
+      expect(json_body).to have_key(:data)
+      expect(json_body[:data]).to be_a(Array)
+      expect(json_body[:data].count).to eq(2)
+    end
+
+    it 'can find a list of items' do
+      expect(json_body[:data][0][:attributes][:name]).to eq('two')
+      expect(json_body[:data][1][:attributes][:name]).to eq('three')
+    end
+  end
+
+  describe 'valid GET /items/find?name= request' do
+    let(:json_body) { JSON.parse(response.body, symbolize_names: true) }
+
+    before do
+      create(:item, name: 'Big Thing')
+      create(:item, name: 'Smallthing')
+      create(:item, name: 'Cool')
+      get '/api/v1/items/find?name=tHI'
+    end
+
+    it { expect(response.status).to eq(200) }
+
+    it 'returns json data' do
+      expect(json_body[:data]).to be_a(Hash)
+      expect(json_body[:data][:attributes][:name]).to eq('Big Thing')
+    end
+  end
+
+  describe 'valid GET /items/find?description= request' do
+    let(:json_body) { JSON.parse(response.body, symbolize_names: true) }
+
+    before do
+      create(:item, name: 'one', description: 'Really great item')
+      create(:item, name: 'two', description: 'A real good item')
+      create(:item, name: 'three', description: 'Bad')
+      get '/api/v1/items/find?description=rEA'
+    end
+
+    it { expect(response.status).to eq(200) }
+
+    it 'returns json data' do
+      expect(json_body[:data]).to be_a(Hash)
+      expect(json_body[:data][:attributes][:name]).to eq('one')
+    end
+  end
+
+  describe 'valid GET /items/find?unit_price= request' do
+    let(:json_body) { JSON.parse(response.body, symbolize_names: true) }
+
+    before do
+      create(:item, name: 'one', unit_price: 12.00)
+      create(:item, name: 'two', unit_price: 12.00)
+      create(:item, name: 'three', unit_price: 8.00)
+      get '/api/v1/items/find?unit_price=12.00'
+    end
+
+    it { expect(response.status).to eq(200) }
+
+    it 'returns json data' do
+      expect(json_body[:data]).to be_a(Hash)
+      expect(json_body[:data][:attributes][:name]).to eq('one')
+    end
+  end
+
+  describe 'valid GET /items/find?created_at= request' do
+    let(:json_body) { JSON.parse(response.body, symbolize_names: true) }
+
+    before do
+      create(:item, name: 'one', created_at: '2012-01-19 14:53:59')
+      create(:item, name: 'two', created_at: '2012-03-27 14:53:59')
+      create(:item, name: 'three', created_at: '2012-03-27 14:53:59')
+      get '/api/v1/items/find?created_at=2012-03-27 14:53:59'
+    end
+
+    it { expect(response.status).to eq(200) }
+
+    it 'returns json data' do
+      expect(json_body).to be_a(Hash)
+      expect(json_body).to have_key(:data)
+      expect(json_body[:data]).to be_a(Hash)
+    end
+
+    it 'can find an item' do
+      expect(json_body[:data][:attributes][:name]).to eq('two')
+    end
+  end
+
+  describe 'valid GET /items/find?updated_at= request' do
+    let(:json_body) { JSON.parse(response.body, symbolize_names: true) }
+
+    before do
+      create(:item, name: 'one', updated_at: '2012-01-19 14:53:59')
+      create(:item, name: 'two', updated_at: '2012-03-27 14:53:59')
+      create(:item, name: 'three', updated_at: '2012-03-27 14:53:59')
+      get '/api/v1/items/find?updated_at=2012-03-27 14:53:59'
+    end
+
+    it { expect(response.status).to eq(200) }
+
+    it 'returns json data' do
+      expect(json_body).to be_a(Hash)
+      expect(json_body).to have_key(:data)
+      expect(json_body[:data]).to be_a(Hash)
+    end
+
+    it 'can find an item' do
+      expect(json_body[:data][:attributes][:name]).to eq('two')
     end
   end
 end
