@@ -13,6 +13,16 @@ RSpec.describe 'Api/V1/Merchants business intelligence request', type: :request 
     it { expect(response.status).to eq(200) }
   end
 
+  describe 'valid GET /api/v1/merchants/most_items?quantity=x request' do
+    let(:json_body) { JSON.parse(response.body, symbolize_names: true) }
+
+    before do
+      get '/api/v1/merchants/most_items?quantity=2'
+    end
+
+    it { expect(response.status).to eq(200) }
+  end
+
   describe 'valid GET /api/v1/merchants/:id/revenue request' do
     let(:json_body) { JSON.parse(response.body, symbolize_names: true) }
 
