@@ -23,6 +23,16 @@ RSpec.describe 'Api/V1/Merchants business intelligence request', type: :request 
     it { expect(response.status).to eq(200) }
   end
 
+  describe 'valid GET /api/v1/revenue?start=<start_date>&end=<end_date> request' do
+    let(:json_body) { JSON.parse(response.body, symbolize_names: true) }
+
+    before do
+      get '/api/v1/revenue?start=2012-03-09&end=2012-03-24'
+    end
+
+    it { expect(response.status).to eq(200) }
+  end
+
   describe 'valid GET /api/v1/merchants/:id/revenue request' do
     let(:json_body) { JSON.parse(response.body, symbolize_names: true) }
 
