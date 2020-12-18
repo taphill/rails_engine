@@ -10,6 +10,7 @@ Rails.application.routes.draw do
         get '/find_all', to: 'search#index'
         get '/find', to: 'search#show'
         get '/most_revenue', to: 'business_intelligence/revenue#index'
+        get '/most_items', to: 'business_intelligence/items#index'
       end
 
       resources :items, except: [:new] do
