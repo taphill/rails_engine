@@ -9,6 +9,8 @@ Rails.application.routes.draw do
       namespace :merchants do
         get '/find_all', to: 'search#index'
         get '/find', to: 'search#show'
+        get '/most_revenue', to: 'business_intelligence/revenue#index'
+        get '/most_items', to: 'business_intelligence/items#index'
       end
 
       resources :items, except: [:new] do
@@ -17,7 +19,10 @@ Rails.application.routes.draw do
 
       resources :merchants, except: [:new] do
         resources :items, only: [:index], controller: 'merchant_items'
+        get '/revenue', to: 'merchants/business_intelligence/revenue#show'
       end
+
+      resources :revenue, only: [:index]
     end
   end
 end
