@@ -1,24 +1,19 @@
-# README
+# Rails Engine
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## Table of Contents
 
-Things you may want to cover:
+  - [What it does](#what-it-does)
+  - [Technology](#technology)
+  - [How to Install](#how-to-install)
+  - [Endpoints](#endpoints)
+  - [Advanced Active Record Queries](#advanced-active-record-queries)
+  
+## What It Does
 
-* Ruby version
+Rails Engine is a RESTful API built in rails which exposes data to the frontend of a fictitious E-Commerce application. All response’s are formatted in JSON and adhere to the specifications outlined on (JSON API)[https://jsonapi.org/format/]
 
-* System dependencies
+## Technology
 
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+This app is built in Rails 5.2 with support from:
+- Fastjsonapi
+- RSpec
