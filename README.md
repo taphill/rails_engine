@@ -10,10 +10,12 @@
   
 ## What It Does
 
-Rails Engine is a RESTful API built in rails which exposes data to the frontend of a fictitious E-Commerce application. All response’s are formatted in JSON and adhere to the specifications outlined on (JSON API)[https://jsonapi.org/format/]
+Rails Engine is a RESTful API built in rails which exposes data to the frontend of a fictitious E-Commerce application. All response’s are formatted in JSON and adhere to the specifications outlined on [JSON API](https://jsonapi.org/format/)
 
 ## Technology
 
 This app is built in Rails 5.2 with support from:
-- Fastjsonapi
-- RSpec
+- Fastjsonapi for serialization
+- RSpec for testing
+
+## Endpoints
