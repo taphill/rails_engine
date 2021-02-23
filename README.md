@@ -17,5 +17,6 @@ Rails Engine is a RESTful API built in rails which exposes data to the frontend 
 This app is built in Rails 5.2 with support from:
 - Fastjsonapi for serialization
 - RSpec for testing
+- RuboCop for linting
 
 ## Endpoints
